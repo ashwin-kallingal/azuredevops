@@ -62,3 +62,4 @@ steps:
     appType: 'webApp'
     appName: 'ashwinkallingal'
     package: '$(System.DefaultWorkingDirectory)/warFile/**/*.war'  # Updated to reflect the path for the WAR file
+    
