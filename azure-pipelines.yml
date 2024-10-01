@@ -10,6 +10,14 @@ pool:
   vmImage: ubuntu-latest
 
 steps:
+# Install Geckodriver
+- script: |
+    GECKODRIVER_VERSION=$(curl -sS https://api.github.com/repos/mozilla/geckodriver/releases/latest | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
+    curl -L -O https://github.com/mozilla/geckodriver/releases/download/$GECKODRIVER_VERSION/geckodriver-$GECKODRIVER_VERSION-linux64.tar.gz
+    tar -xzf geckodriver-$GECKODRIVER_VERSION-linux64.tar.gz -C /usr/local/bin/
+  displayName: 'Install Geckodriver'
+
+# Run Maven
 - task: Maven@3
   inputs:
     mavenPomFile: 'pom.xml'
@@ -20,10 +28,14 @@ steps:
     publishJUnitResults: true
     testResultsFiles: '**/surefire-reports/TEST-*.xml'
     goals: 'package'
+
+# Copy WAR file
 - task: CopyFiles@2
   inputs:
     Contents: '**/*.war'
     TargetFolder: '$(build.artifactstagingdirectory)'
+
+# Publish Build Artifacts
 - task: PublishBuildArtifacts@1
   inputs:
     PathtoPublish: '$(Build.ArtifactStagingDirectory)'
