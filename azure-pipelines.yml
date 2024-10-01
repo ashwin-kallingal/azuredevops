@@ -10,12 +10,12 @@ pool:
   vmImage: ubuntu-latest
 
 steps:
-# Install JDK 11 if necessary
+# Install JDK 11
 - task: JavaToolInstaller@0
   inputs:
     versionSpec: '11'
     jdkArchitectureOption: 'x64'
-    # Consider removing jdkSourceOption if using a hosted agent
+    jdkSourceOption: 'PreInstalled'  # You can use 'Jdk' to get it from the Azure tool cache
   displayName: 'Install JDK 11'
 
 # Check Java and Maven versions
