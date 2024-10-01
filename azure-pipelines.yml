@@ -1,32 +1,30 @@
-# Maven
-# Build your Java project and run tests with Apache Maven.
-# Add steps that analyze code, save build artifacts, deploy, and more:
-# https://docs.microsoft.com/azure/devops/pipelines/languages/java
-# CI/CD PipeLine
+# Maven CI/CD Pipeline
 
 trigger:
-- master
+- master  # Triggers on changes to the master branch
 
 pool:
-  vmImage: ubuntu-latest
+  vmImage: ubuntu-latest  # Using the latest Ubuntu image
 
 steps:
 - task: Maven@3
   inputs:
-    mavenPomFile: 'pom.xml'
-    mavenOptions: '-Xmx3072m'
-    javaHomeOption: 'JDKVersion'
-    jdkVersionOption: '11'
-    jdkArchitectureOption: 'x64'
-    publishJUnitResults: true
-    testResultsFiles: '**/surefire-reports/TEST-*.xml'
-    goals: 'package'
+    mavenPomFile: 'pom.xml'  # Path to your POM file
+    mavenOptions: '-Xmx3072m'  # JVM memory allocation for Maven
+    javaHomeOption: 'JDKVersion'  # Use the specified JDK version
+    jdkVersionOption: '11'  # Specify JDK 11
+    jdkArchitectureOption: 'x64'  # Specify x64 architecture
+    publishJUnitResults: true  # Publish JUnit test results
+    testResultsFiles: '**/surefire-reports/TEST-*.xml'  # Path to JUnit results
+    goals: 'package'  # Maven goal to execute
+
 - task: CopyFiles@2
   inputs:
-    Contents: '**/*.war'
-    TargetFolder: '$(build.artifactstagingdirectory)'
+    Contents: '**/*.war'  # Files to copy (change this if your output is not .war)
+    TargetFolder: '$(build.artifactStagingDirectory)'  # Where to copy the files
+
 - task: PublishBuildArtifacts@1
   inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-    ArtifactName: 'warFile'
-    publishLocation: 'Container'
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'  # Path to publish
+    ArtifactName: 'warFile'  # Name of the artifact
+    publishLocation: 'Container'  # Publish location type
