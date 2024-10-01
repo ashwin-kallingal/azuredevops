@@ -15,10 +15,16 @@ steps:
     testResultsFiles: '**/surefire-reports/TEST-*.xml'
     goals: 'package'
 
+# List the contents of the target directory for debugging
+- script: |
+    echo "Contents of the target directory after Maven build:"
+    ls -R target
+  displayName: 'List contents of target directory'
+
 # Copy WAR file
 - task: CopyFiles@2
   inputs:
-    Contents: '**/*.war'
+    Contents: 'target/**/*.war'  # Adjusting to target directory where WAR is usually built
     TargetFolder: '$(build.artifactstagingdirectory)'
 
 # List the contents of the artifact staging directory for debugging
