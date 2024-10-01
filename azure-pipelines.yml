@@ -1,33 +1,32 @@
 # Maven
 # Build your Java project and run tests with Apache Maven.
-# CI/CD Pipeline
+# Add steps that analyze code, save build artifacts, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/java
+# CI/CD PipeLine
 
 trigger:
-  branches:
-    include:
-      - master
+- master
 
 pool:
   vmImage: ubuntu-latest
+
 steps:
 - task: Maven@3
   inputs:
     mavenPomFile: 'pom.xml'
     mavenOptions: '-Xmx3072m'
     javaHomeOption: 'JDKVersion'
-    jdkVersionOption: '12'
+    jdkVersionOption: '11'
     jdkArchitectureOption: 'x64'
     publishJUnitResults: true
     testResultsFiles: '**/surefire-reports/TEST-*.xml'
-    goals: 'clean package'
-
+    goals: 'package'
 - task: CopyFiles@2
   inputs:
-    contents: '**/*.war'
-    targetFolder: '$(build.artifactstagingdirectory)'
-
+    Contents: '**/*.war'
+    TargetFolder: '$(build.artifactstagingdirectory)'
 - task: PublishBuildArtifacts@1
   inputs:
-    pathToPublish: '$(build.artifactstagingdirectory)'
-    artifactName: 'warFile'
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: 'warFile'
     publishLocation: 'Container'
