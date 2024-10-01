@@ -1,47 +1,39 @@
 # Maven
 # Build your Java project and run tests with Apache Maven.
-# Add steps that analyze code, save build artifacts, deploy, and more:
-# https://docs.microsoft.com/azure/devops/pipelines/languages/java
-# CI/CD PipeLine.
+# CI/CD Pipeline
 
 trigger:
-- master
+  branches:
+    include:
+      - master
 
 pool:
   vmImage: ubuntu-latest
 
 steps:
-# Install Java 11 using a script
-- script: |
-    sudo apt-get update
-    sudo apt-get install -y openjdk-11-jdk
-  displayName: 'Install Java 11'
+- task: UseJavaVersion@1
+  inputs:
+    versionSpec: '12'
+    architecture: 'x64'
 
-# Verify Java Version
-- script: |
-    java -version
-  displayName: 'Verify Java Version'
-
-# Maven Build
 - task: Maven@3
   inputs:
     mavenPomFile: 'pom.xml'
     mavenOptions: '-Xmx3072m'
-    javaHomeOption: 'Path'
-    jdkDirectory: '/usr/lib/jvm/java-11-openjdk-amd64'
+    javaHomeOption: 'JDKVersion'
+    jdkVersionOption: '12'
+    jdkArchitectureOption: 'x64'
     publishJUnitResults: true
     testResultsFiles: '**/surefire-reports/TEST-*.xml'
-    goals: 'package'
+    goals: 'clean package'
 
-# Copy WAR file (if applicable)
 - task: CopyFiles@2
   inputs:
-    Contents: '**/*.war'
-    TargetFolder: '$(build.artifactstagingdirectory)'
+    contents: '**/*.war'
+    targetFolder: '$(build.artifactstagingdirectory)'
 
-# Publish Build Artifacts
 - task: PublishBuildArtifacts@1
   inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-    ArtifactName: 'warFile'
+    pathToPublish: '$(build.artifactstagingdirectory)'
+    artifactName: 'warFile'
     publishLocation: 'Container'
