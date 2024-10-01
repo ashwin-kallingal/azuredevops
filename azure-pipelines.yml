@@ -13,7 +13,13 @@ steps:
     mavenOptions: '-X -e -Xmx3072m'
     publishJUnitResults: true
     testResultsFiles: '**/surefire-reports/TEST-*.xml'
-    goals: 'clean package'  # Added clean to ensure a fresh build
+    goals: 'clean package'  # Ensure clean and package goals
+
+# List the contents of the source directory for debugging
+- script: |
+    echo "Contents of the source directory:"
+    ls -R $(Build.SourcesDirectory)
+  displayName: 'List contents of source directory'
 
 # List the contents of the target directory for debugging
 - script: |
