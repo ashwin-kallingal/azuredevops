@@ -11,30 +11,28 @@ pool:
   vmImage: ubuntu-latest
 
 steps:
-# Install Google Chrome
-- script: |
-    sudo apt-get update
-    sudo apt-get install -y google-chrome-stable
-  displayName: 'Install Google Chrome'
-
-# Install ChromeDriver
 - script: |
     CHROME_VERSION=$(google-chrome --version | awk '{print $3}' | cut -d '.' -f 1)
+    echo "Detected Chrome version: $CHROME_VERSION"
+    
     CHROMEDRIVER_VERSION=$(curl -sS https://chromedriver.storage.googleapis.com/LATEST_RELEASE_$CHROME_VERSION)
+    echo "ChromeDriver version to be downloaded: $CHROMEDRIVER_VERSION"
+    
     if [ -z "$CHROMEDRIVER_VERSION" ]; then
-      echo "Failed to fetch ChromeDriver version. Exiting."
-      exit 1
+      echo "Failed to fetch ChromeDriver version. Using default version."
+      CHROMEDRIVER_VERSION="114.0.5735.90"  # Example fallback version
     fi
-    curl -O https://chromedriver.storage.googleapis.com/$CHROMEDRIVER_VERSION/chromedriver_linux64.zip
+
+    curl -O --retry 5 --retry-delay 5 https://chromedriver.storage.googleapis.com/$CHROMEDRIVER_VERSION/chromedriver_linux64.zip
     if [ ! -f chromedriver_linux64.zip ]; then
       echo "Failed to download ChromeDriver. Exiting."
       exit 1
     fi
+
     unzip chromedriver_linux64.zip -d /usr/local/bin/
     chmod +x /usr/local/bin/chromedriver
   displayName: 'Install ChromeDriver'
 
-# Build and run tests with Maven
 - task: Maven@3
   inputs:
     mavenPomFile: 'pom.xml'
@@ -46,13 +44,11 @@ steps:
     testResultsFiles: '**/surefire-reports/TEST-*.xml'
     goals: 'package'
 
-# Copy WAR files to artifact staging directory
 - task: CopyFiles@2
   inputs:
     Contents: '**/*.war'
     TargetFolder: '$(build.artifactstagingdirectory)'
 
-# Publish build artifacts
 - task: PublishBuildArtifacts@1
   inputs:
     PathtoPublish: '$(Build.ArtifactStagingDirectory)'
