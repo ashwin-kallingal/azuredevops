@@ -10,12 +10,12 @@ pool:
   vmImage: ubuntu-latest
 
 steps:
-# Install JDK 11
+# Install JDK 11 if necessary
 - task: JavaToolInstaller@0
   inputs:
     versionSpec: '11'
     jdkArchitectureOption: 'x64'
-    jdkSourceOption: 'PreInstalled'  # You can use 'Jdk' to get it from the Azure tool cache
+    jdkSourceOption: 'PreInstalled'  # Added this input
   displayName: 'Install JDK 11'
 
 # Check Java and Maven versions
@@ -42,9 +42,23 @@ steps:
     Contents: '**/*.war'
     TargetFolder: '$(build.artifactstagingdirectory)'
 
+# List contents of the artifact staging directory
+- script: |
+    echo "Listing contents of the artifact staging directory:"
+    ls $(build.artifactstagingdirectory)
+  displayName: 'List Artifact Staging Directory Contents'
+
 # Publish Build Artifacts
 - task: PublishBuildArtifacts@1
   inputs:
     PathtoPublish: '$(Build.ArtifactStagingDirectory)'
     ArtifactName: 'warFile'
     publishLocation: 'Container'
+
+# Deploy to Azure App Service
+- task: AzureWebApp@1
+  inputs:
+    azureSubscription: 'Free Trial (2cee8c2c-05e3-45f6-b58b-38bde49e1643)'
+    appType: 'webApp'
+    appName: 'MyWebApp'
+    package: '$(System.DefaultWorkingDirectory)/warFile/**/*.war'  # Updated to reflect the path for the WAR file
