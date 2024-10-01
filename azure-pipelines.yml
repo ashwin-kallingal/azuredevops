@@ -10,13 +10,11 @@ pool:
   vmImage: ubuntu-latest
 
 steps:
-- task: Maven@3
+# Run Maven with updated version
+- task: Maven@4  # Updated from Maven@3 to Maven@4
   inputs:
     mavenPomFile: 'pom.xml'
-    mavenOptions: '-Xmx3072m'
-    javaHomeOption: 'JDKVersion'
-    jdkVersionOption: '1.11'
-    jdkArchitectureOption: 'x64'
+    mavenOptions: '-X -e -Xmx3072m'
     publishJUnitResults: true
     testResultsFiles: '**/surefire-reports/TEST-*.xml'
     goals: 'package'
