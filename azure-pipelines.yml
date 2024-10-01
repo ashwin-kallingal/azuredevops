@@ -1,8 +1,4 @@
-# Maven
 # Build your Java project and run tests with Apache Maven.
-# Add steps that analyze code, save build artifacts, deploy, and more:
-# https://docs.microsoft.com/azure/devops/pipelines/languages/java
-
 trigger:
 - master
 
@@ -18,12 +14,30 @@ steps:
     publishJUnitResults: true
     testResultsFiles: '**/surefire-reports/TEST-*.xml'
     goals: 'package'
+
+# Copy WAR file
 - task: CopyFiles@2
   inputs:
     Contents: '**/*.war'
     TargetFolder: '$(build.artifactstagingdirectory)'
+
+# List the contents of the build directory for debugging
+- script: |
+    echo "Contents of the build directory:"
+    ls -R $(Build.SourcesDirectory)
+  displayName: 'List contents of build directory'
+
+# Publish Build Artifacts
 - task: PublishBuildArtifacts@1
   inputs:
     PathtoPublish: '$(Build.ArtifactStagingDirectory)'
     ArtifactName: 'warFile'
     publishLocation: 'Container'
+
+# Deploy to Azure App Service (in the release pipeline)
+- task: AzureWebApp@1
+  inputs:
+    azureSubscription: 'Free Trial (2cee8c2c-05e3-45f6-b58b-38bde49e1643)'
+    appType: 'webApp'
+    appName: 'ashwinkallingal'
+    package: '$(Pipeline.Workspace)/warFile/**/*.war'  # Use this updated path
