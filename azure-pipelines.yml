@@ -60,5 +60,5 @@ steps:
   inputs:
     azureSubscription: 'Free Trial (2cee8c2c-05e3-45f6-b58b-38bde49e1643)'
     appType: 'webApp'
-    appName: 'MyWebApp'
+    appName: 'ashwinkallingal'
     package: '$(System.DefaultWorkingDirectory)/warFile/**/*.war'  # Updated to reflect the path for the WAR file
