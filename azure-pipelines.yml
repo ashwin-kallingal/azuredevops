@@ -11,35 +11,36 @@ pool:
   vmImage: ubuntu-latest
 
 steps:
+# Install Java 11
+- task: UseJavaVersion@1
+  inputs:
+    versionSpec: '11'
+    architecture: 'x64'
+  displayName: 'Install Java 11'
+
+# Verify Java Version
 - script: |
     java -version
   displayName: 'Verify Java Version'
 
-- task: Bash@3
-  inputs:
-    targetType: 'inline'
-    script: |
-      echo "Setting JAVA_HOME to JDK 11"
-      export JAVA_HOME=$(JAVA_HOME_11_X64)
-      echo "JAVA_HOME set to $JAVA_HOME"
-  displayName: 'Set JAVA_HOME to JDK 11'
-
+# Maven Build
 - task: Maven@3
   inputs:
     mavenPomFile: 'pom.xml'
     mavenOptions: '-Xmx3072m'
-    javaHomeOption: 'JDKVersion'
-    jdkVersionOption: '11'
-    jdkArchitectureOption: 'x64'
+    javaHomeOption: 'Path'
+    jdkDirectory: '$(JAVA_HOME_11_X64)'
     publishJUnitResults: true
     testResultsFiles: '**/surefire-reports/TEST-*.xml'
     goals: 'package'
 
+# Copy WAR file (if applicable)
 - task: CopyFiles@2
   inputs:
     Contents: '**/*.war'
     TargetFolder: '$(build.artifactstagingdirectory)'
 
+# Publish Build Artifacts
 - task: PublishBuildArtifacts@1
   inputs:
     PathtoPublish: '$(Build.ArtifactStagingDirectory)'
