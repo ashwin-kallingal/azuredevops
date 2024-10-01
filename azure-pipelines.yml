@@ -21,12 +21,6 @@ steps:
     Contents: '**/*.war'
     TargetFolder: '$(build.artifactstagingdirectory)'
 
-# List the contents of the build directory for debugging
-- script: |
-    echo "Contents of the build directory:"
-    ls -R $(Build.SourcesDirectory)
-  displayName: 'List contents of build directory'
-
 # Publish Build Artifacts
 - task: PublishBuildArtifacts@1
   inputs:
@@ -34,10 +28,3 @@ steps:
     ArtifactName: 'warFile'
     publishLocation: 'Container'
 
-# Deploy to Azure App Service (in the release pipeline)
-- task: AzureWebApp@1
-  inputs:
-    azureSubscription: 'Free Trial (2cee8c2c-05e3-45f6-b58b-38bde49e1643)'  # Replace with your Azure Subscription
-    appType: 'webApp'
-    appName: 'ashwinkallingal'  # Replace with your App Service Name
-    package: '$(Pipeline.Workspace)/warFile/**/*.war'  # Use this updated path
