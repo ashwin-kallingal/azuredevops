@@ -1,27 +1,26 @@
-# Build your Java project and run tests with Apache Maven.
 trigger:
 - master
 
 pool:
-  vmImage: ubuntu-latest
+  vmImage: 'ubuntu-latest'
 
 steps:
-# Run Maven with updated version
+# Check Java and Maven versions
+- script: |
+    echo "Checking Java version:"
+    java -version
+    echo "Checking Maven version:"
+    mvn -version
+  displayName: 'Check Java and Maven Versions'
+
+# Run Maven build
 - task: Maven@4
   inputs:
-    mavenPomFile: 'pom.xml'
-    mavenOptions: '-X -e -Xmx3072m'
-    publishJUnitResults: true
-    testResultsFiles: '**/surefire-reports/TEST-*.xml'
-    goals: 'clean package'  # Ensure clean and package goals
+    mavenPomFile: 'server/pom.xml'  # Ensure this path is correct
+    goals: 'clean package'
+    options: '-DskipTests -X -e'  # Enable verbose output
 
-# List the contents of the source directory for debugging
-- script: |
-    echo "Contents of the source directory:"
-    ls -R $(Build.SourcesDirectory)
-  displayName: 'List contents of source directory'
-
-# List the contents of the target directory for debugging
+# List the contents of the target directory after Maven build
 - script: |
     echo "Contents of the target directory after Maven build:"
     ls -R target || echo "Target directory does not exist."
@@ -30,8 +29,8 @@ steps:
 # Copy WAR file
 - task: CopyFiles@2
   inputs:
-    Contents: 'target/**/*.war'  # Adjusting to target directory where WAR is usually built
-    TargetFolder: '$(build.artifactstagingdirectory)'
+    Contents: 'target/**/*.war'
+    TargetFolder: '$(Build.ArtifactStagingDirectory)'
 
 # List the contents of the artifact staging directory for debugging
 - script: |
@@ -46,10 +45,10 @@ steps:
     ArtifactName: 'warFile'
     publishLocation: 'Container'
 
-# Deploy to Azure App Service (in the release pipeline)
+# Deploy to Azure App Service
 - task: AzureWebApp@1
   inputs:
     azureSubscription: 'Free Trial (2cee8c2c-05e3-45f6-b58b-38bde49e1643)'
     appType: 'webApp'
     appName: 'ashwinkallingal'
-    package: '$(Build.ArtifactStagingDirectory)/**/*.war'  # Use the correct path here
+    package: '$(Build.ArtifactStagingDirectory)/**/*.war'
