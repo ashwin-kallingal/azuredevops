@@ -15,7 +15,7 @@ steps:
   inputs:
     versionSpec: '11'
     jdkArchitectureOption: 'x64'
-    jdkSourceOption: 'PreInstalled'
+    # Consider removing jdkSourceOption if using a hosted agent
   displayName: 'Install JDK 11'
 
 # Check Java and Maven versions
