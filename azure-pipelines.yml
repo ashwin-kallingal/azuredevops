@@ -11,6 +11,13 @@ pool:
   vmImage: ubuntu-latest
 
 steps:
+- script: |
+    CHROME_VERSION=$(google-chrome --version | grep -oP "\d+\.\d+\.\d+")
+    CHROMEDRIVER_VERSION=$(curl -sS https://chromedriver.storage.googleapis.com/LATEST_RELEASE_$CHROME_VERSION)
+    curl -O https://chromedriver.storage.googleapis.com/$CHROMEDRIVER_VERSION/chromedriver_linux64.zip
+    unzip chromedriver_linux64.zip -d /usr/local/bin/
+  displayName: 'Install ChromeDriver'
+
 - task: Maven@3
   inputs:
     mavenPomFile: 'pom.xml'
@@ -21,13 +28,14 @@ steps:
     publishJUnitResults: true
     testResultsFiles: '**/surefire-reports/TEST-*.xml'
     goals: 'package'
+
 - task: CopyFiles@2
   inputs:
     Contents: '**/*.war'
     TargetFolder: '$(build.artifactstagingdirectory)'
+
 - task: PublishBuildArtifacts@1
   inputs:
     PathtoPublish: '$(Build.ArtifactStagingDirectory)'
     ArtifactName: 'warFile'
     publishLocation: 'Container'
-
