@@ -1,8 +1,4 @@
 # Build your Java project and run tests with Apache Maven.
-# Add steps that analyze code, save build artifacts, deploy, and more:
-# https://docs.microsoft.com/azure/devops/pipelines/languages/java
-# Crosscheck CI/CD Components Checked
-
 trigger:
 - master
 
@@ -10,28 +6,11 @@ pool:
   vmImage: ubuntu-latest
 
 steps:
-# Install JDK 11 if necessary
-- task: JavaToolInstaller@0
-  inputs:
-    versionSpec: '11'
-    jdkArchitectureOption: 'x64'
-    jdkSourceOption: 'PreInstalled'  # Added this input
-  displayName: 'Install JDK 11'
-
-# Check Java and Maven versions
-- script: |
-    java -version
-    mvn -v
-  displayName: 'Check Java and Maven Version'
-
 # Run Maven
 - task: Maven@3
   inputs:
     mavenPomFile: 'pom.xml'
-    mavenOptions: '-X -e -Xmx3072m'  # Added debug options
-    javaHomeOption: 'JDKVersion'
-    jdkVersionOption: '11'  # Ensure this matches your requirements
-    jdkArchitectureOption: 'x64'
+    mavenOptions: '-X -e -Xmx3072m'
     publishJUnitResults: true
     testResultsFiles: '**/surefire-reports/TEST-*.xml'
     goals: 'package'
@@ -42,11 +21,11 @@ steps:
     Contents: '**/*.war'
     TargetFolder: '$(build.artifactstagingdirectory)'
 
-# List contents of the artifact staging directory
+# List the contents of the build directory for debugging
 - script: |
-    echo "Listing contents of the artifact staging directory:"
-    ls $(build.artifactstagingdirectory)
-  displayName: 'List Artifact Staging Directory Contents'
+    echo "Contents of the build directory:"
+    ls -R $(Build.SourcesDirectory)
+  displayName: 'List contents of build directory'
 
 # Publish Build Artifacts
 - task: PublishBuildArtifacts@1
@@ -55,11 +34,10 @@ steps:
     ArtifactName: 'warFile'
     publishLocation: 'Container'
 
-# Deploy to Azure App Service
+# Deploy to Azure App Service (in the release pipeline)
 - task: AzureWebApp@1
   inputs:
-    azureSubscription: 'Free Trial (2cee8c2c-05e3-45f6-b58b-38bde49e1643)'
+    azureSubscription: 'Free Trial (2cee8c2c-05e3-45f6-b58b-38bde49e1643)'  # Replace with your Azure Subscription
     appType: 'webApp'
-    appName: 'ashwinkallingal'
-    package: '$(System.DefaultWorkingDirectory)/warFile/**/*.war'  # Updated to reflect the path for the WAR file
-    
+    appName: 'ashwinkallingal'  # Replace with your App Service Name
+    package: '$(Pipeline.Workspace)/warFile/**/*.war'  # Use this updated path
