@@ -2,7 +2,6 @@
 # Build your Java project and run tests with Apache Maven.
 # Add steps that analyze code, save build artifacts, deploy, and more:
 # https://docs.microsoft.com/azure/devops/pipelines/languages/java
-# Cross CI
 
 trigger:
 - master
@@ -12,6 +11,13 @@ pool:
 
 steps:
 - script: |
+    echo "Checking if chromedriver.storage.googleapis.com is resolvable"
+    nslookup chromedriver.storage.googleapis.com
+    if [ $? -ne 0 ]; then
+      echo "DNS resolution failed. Exiting."
+      exit 1
+    fi
+
     CHROME_VERSION=$(google-chrome --version | awk '{print $3}' | cut -d '.' -f 1)
     echo "Detected Chrome version: $CHROME_VERSION"
     
@@ -23,7 +29,7 @@ steps:
       CHROMEDRIVER_VERSION="114.0.5735.90"  # Example fallback version
     fi
 
-    curl -O --retry 5 --retry-delay 5 https://chromedriver.storage.googleapis.com/$CHROMEDRIVER_VERSION/chromedriver_linux64.zip
+    curl -O --retry 5 --retry-delay 5 --connect-timeout 10 https://chromedriver.storage.googleapis.com/$CHROMEDRIVER_VERSION/chromedriver_linux64.zip
     if [ ! -f chromedriver_linux64.zip ]; then
       echo "Failed to download ChromeDriver. Exiting."
       exit 1
