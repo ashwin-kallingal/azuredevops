@@ -22,14 +22,7 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.13.2</version> <!-- Updated to the latest JUnit version -->
-            <scope>test</scope>
-        </dependency>
-        
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit-dep</artifactId>
-            <version>4.13.2</version> <!-- Specify version for junit-dep -->
+            <version>4.13.2</version> <!-- Keep the latest JUnit version -->
             <scope>test</scope>
         </dependency>
         
