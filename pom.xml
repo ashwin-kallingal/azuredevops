@@ -85,6 +85,16 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.0.0-M5</version>
             </plugin>
+
+                  <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-war-plugin</artifactId>
+            <version>3.3.1</version> <!-- Use the latest version -->
+            <configuration>
+                <warSourceDirectory>src/main/webapp</warSourceDirectory>
+                <webxml>WEB-INF/web.xml</webxml> <!-- Point to your web.xml -->
+            </configuration>
+        </plugin>
         </plugins>
     </build>
 </project>
