@@ -1,9 +1,3 @@
-# Maven
-# Build your Java project and run tests with Apache Maven.
-# Add steps that analyze code, save build artifacts, deploy, and more:
-# https://docs.microsoft.com/azure/devops/pipelines/languages/java
-# CI/CD Pipeline Components
-
 trigger:
 - master
 
@@ -17,7 +11,7 @@ steps:
 # Step 1: Install Java version
 - task: JavaToolInstaller@0
   inputs:
-    jdkVersionOption: '$(javaVersion)'
+    jdkVersionOption: '11'
     jdkArchitectureOption: 'x64'
     jdkSourceOption: 'PreInstalled'  # Can be 'PreInstalled' or 'AzureStorage' for a custom source
   displayName: 'Install Java version'
@@ -39,7 +33,14 @@ steps:
     goals: 'clean package'
   displayName: 'Maven Build'
 
-# Step 4: Publish Build Artifacts
+# Step 4: Copy WAR File to Artifact Staging Directory
+- task: CopyFiles@2
+  inputs:
+    contents: '**/*.war'
+    targetFolder: '$(Build.ArtifactStagingDirectory)'
+  displayName: 'Copy WAR File to Staging Directory'
+
+# Step 5: Publish Build Artifacts
 - task: PublishBuildArtifacts@1
   inputs:
     PathtoPublish: '$(Build.ArtifactStagingDirectory)'
@@ -47,18 +48,10 @@ steps:
     publishLocation: 'Container'
   displayName: 'Publish Build Artifacts'
 
-# Step 5: Download Build Artifacts
-- task: DownloadBuildArtifacts@0
-  inputs:
-    buildType: 'current'
-    downloadPath: '$(System.ArtifactsDirectory)'
-    artifactName: 'warfile'  # Specify the name of the artifact to download
-  displayName: 'Download Build Artifacts'
-
 # Step 6: Deploy to Azure App Service
 - task: AzureWebApp@1
   inputs:
     azureSubscription: 'Free Trial (2cee8c2c-05e3-45f6-b58b-38bde49e1643)'
     appName: 'ashwinkallingal'
-    package: '$(System.ArtifactsDirectory)/**/*.war'
+    package: '$(Build.ArtifactStagingDirectory)/**/*.war'
   displayName: 'Deploy to Azure App Service'
