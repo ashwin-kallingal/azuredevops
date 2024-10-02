@@ -13,11 +13,13 @@ steps:
   inputs:
     jdkVersionOption: '11'
     jdkArchitectureOption: 'x64'
-    jdkSourceOption: 'PreInstalled'  # Can be 'PreInstalled' or 'AzureStorage' for a custom source
+    jdkSourceOption: 'PreInstalled'  # Ensure this is set to 'PreInstalled'
   displayName: 'Install Java version'
 
 # Step 2: Check Java version
-- script: java -version
+- script: |
+    echo "Checking Java version..."
+    java -version
   displayName: 'Check Java version'
 
 # Step 3: Maven Build
