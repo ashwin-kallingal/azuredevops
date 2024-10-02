@@ -10,7 +10,22 @@ trigger:
 pool:
   vmImage: ubuntu-latest
 
+variables:
+  javaVersion: '11'  # Set the required Java version
+
 steps:
+# Step 1: Use Java version
+- task: UseJavaVersion@1
+  inputs:
+    versionSpec: '$(javaVersion)'
+    jdkArchitecture: 'x64'
+  displayName: 'Set Java version'
+
+# Step 2: Check Java version
+- script: java -version
+  displayName: 'Check Java version'
+
+# Step 3: Maven Build
 - task: Maven@3
   inputs:
     mavenPomFile: 'pom.xml'
@@ -20,13 +35,28 @@ steps:
     jdkArchitectureOption: 'x64'
     publishJUnitResults: true
     testResultsFiles: '**/surefire-reports/TEST-*.xml'
-    goals: 'package'
-- task: CopyFiles@2
-  inputs:
-    Contents: '**/*.war'
-    TargetFolder: '$(build.artifactstagingdirectory)'
+    goals: 'clean package'
+  displayName: 'Maven Build'
+
+# Step 4: Publish Build Artifacts
 - task: PublishBuildArtifacts@1
   inputs:
     PathtoPublish: '$(Build.ArtifactStagingDirectory)'
     ArtifactName: 'warfile'
     publishLocation: 'Container'
+  displayName: 'Publish Build Artifacts'
+
+# Step 5: Download Build Artifacts
+- task: DownloadBuildArtifacts@0
+  inputs:
+    buildType: 'current'
+    downloadPath: '$(System.ArtifactsDirectory)'
+  displayName: 'Download Build Artifacts'
+
+# Step 6: Deploy to Azure App Service
+- task: AzureWebApp@1
+  inputs:
+    azureSubscription: 'Free Trial (2cee8c2c-05e3-45f6-b58b-38bde49e1643)'
+    appName: 'ashwinkallingal'
+    package: '$(System.ArtifactsDirectory)/**/*.war'
+  displayName: 'Deploy to Azure App Service'
