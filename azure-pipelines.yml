@@ -52,6 +52,7 @@ steps:
   inputs:
     buildType: 'current'
     downloadPath: '$(System.ArtifactsDirectory)'
+    artifactName: 'warfile'  # Specify the name of the artifact to download
   displayName: 'Download Build Artifacts'
 
 # Step 6: Deploy to Azure App Service
