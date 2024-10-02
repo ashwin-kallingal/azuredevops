@@ -17,8 +17,9 @@ steps:
 # Step 1: Install Java version
 - task: JavaToolInstaller@0
   inputs:
-    versionSpec: '$(javaVersion)'
+    jdkVersionOption: '$(javaVersion)'
     jdkArchitectureOption: 'x64'
+    jdkSourceOption: 'PreInstalled'  # Can be 'PreInstalled' or 'AzureStorage' for a custom source
   displayName: 'Install Java version'
 
 # Step 2: Check Java version
