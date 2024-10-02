@@ -2,7 +2,7 @@ trigger:
 - master
 
 pool:
-  vmImage: ubuntu-latest
+  vmImage: 'ubuntu-latest'
 
 variables:
   javaVersion: '11'  # Set the required Java version
@@ -11,15 +11,13 @@ steps:
 # Step 1: Install Java version
 - task: JavaToolInstaller@0
   inputs:
-    versionSpec: '11'  # Specify the required Java version
+    jdkVersionOption: '11'
     jdkArchitectureOption: 'x64'
     jdkSourceOption: 'PreInstalled'  # Can be 'PreInstalled' or 'AzureStorage' for a custom source
   displayName: 'Install Java version'
 
 # Step 2: Check Java version
-- script: |
-    echo "Java version:"
-    java -version
+- script: java -version
   displayName: 'Check Java version'
 
 # Step 3: Maven Build
@@ -28,7 +26,7 @@ steps:
     mavenPomFile: 'pom.xml'
     mavenOptions: '-Xmx3072m'
     javaHomeOption: 'JDKVersion'
-    jdkVersionOption: '11'  # Use the specified JDK version
+    jdkVersionOption: '11'
     jdkArchitectureOption: 'x64'
     publishJUnitResults: true
     testResultsFiles: '**/surefire-reports/TEST-*.xml'
