@@ -2,7 +2,7 @@ trigger:
 - master
 
 pool:
-  vmImage: 'ubuntu-latest'
+  vmImage: 'ubuntu-20.04'  # Updated to a specific Ubuntu version that may have Java 11 available
 
 variables:
   javaVersion: '11'  # Set the required Java version
@@ -13,7 +13,7 @@ steps:
   inputs:
     jdkVersionOption: '11'
     jdkArchitectureOption: 'x64'
-    jdkSourceOption: 'PreInstalled'  # Ensure this is set to 'PreInstalled'
+    # jdkSourceOption removed to force installation from Azure
   displayName: 'Install Java version'
 
 # Step 2: Check Java version
