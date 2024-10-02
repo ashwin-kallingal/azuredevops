@@ -14,12 +14,12 @@ variables:
   javaVersion: '11'  # Set the required Java version
 
 steps:
-# Step 1: Use Java version
-- task: UseJavaVersion@1
+# Step 1: Install Java version
+- task: JavaToolInstaller@0
   inputs:
     versionSpec: '$(javaVersion)'
-    jdkArchitecture: 'x64'
-  displayName: 'Set Java version'
+    jdkArchitectureOption: 'x64'
+  displayName: 'Install Java version'
 
 # Step 2: Check Java version
 - script: java -version
